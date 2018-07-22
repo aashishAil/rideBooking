@@ -49,6 +49,10 @@ io = require('socket.io')(http);
 
 io.on('connection' , socket => {
    console.log('User connected');
+   socket.on('Accept Request', () => {
+       console.log('Request accepted by driver');
+       io.emit('Accept Request', { for: 'everyone' });
+   });
    socket.on('disconnect', () => {
       console.log('User disconnected');
    });

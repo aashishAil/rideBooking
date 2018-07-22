@@ -2,6 +2,16 @@ window.onload = function (){
     getData();
 };
 
+var socket = io();
+
+socket.on('Accept Request', function(){
+    location.reload();
+});
+
+socket.on('New Request',function(){
+    location.reload();
+});
+
 function getData() {
     var xmlHttp = new XMLHttpRequest();
     var url = 'http://192.168.0.4:5432/api/requests/' + document.getElementById('driverId').innerHTML;
@@ -34,6 +44,7 @@ function acceptRequest(){
     xmlHttp.onreadystatechange = function(){
         if(this.readyState == 4){
             if (this.status == 200){
+                socket.emit('Accept Request');
                 window.alert('Request successfully accepted');
                 location.reload();
             }
