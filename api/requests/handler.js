@@ -67,11 +67,8 @@ exports.getDriverRequests = (variables) => {
                     newData["createdTime"] = singleData.createdTime;
                     newData["customerId"] = singleData.customerId;
                     newData["requestId"] = singleData.requestId;
-                    if(singleData.completedTime)
-                        newData['completedTime'] = singleData.elapsedCompletedTime(false);
-                    if(singleData.ongoingTime)
-                        newData['pickedUpTime'] = singleData.elapsedOngoingTime(false);
-                    newData['requestTime'] = singleData.elapsedCreatedTime(false);
+                    let tmp = singleData.elapsedCreatedTime(false);
+                    newData['requestTime'] = tmp == "" ? "0 minutes " : tmp;
                     return newData;
                 });
                 returnData['waiting'] = waitingRequests;
@@ -85,11 +82,12 @@ exports.getDriverRequests = (variables) => {
                     newData["createdTime"] = singleData.createdTime;
                     newData["customerId"] = singleData.customerId;
                     newData["requestId"] = singleData.requestId;
-                    if(singleData.completedTime)
-                        newData['completedTime'] = singleData.elapsedCompletedTime(false);
-                    if(singleData.ongoingTime)
-                        newData['pickedUpTime'] = singleData.elapsedOngoingTime(false);
-                    newData['requestTime'] = singleData.elapsedCreatedTime(false);
+                    let tmp = singleData.elapsedCreatedTime(false);
+                    newData['requestTime'] = tmp == "" ? "0 minutes " : tmp;
+                    if(singleData.ongoingTime){
+                        tmp = singleData.elapsedOngoingTime(false);
+                        newData['pickedUpTime'] = tmp == "" ? "0 minutes " : tmp;
+                    }
                     return newData;
                 });
                 returnData['ongoing'] = ongoingRequests;
@@ -103,11 +101,16 @@ exports.getDriverRequests = (variables) => {
                     newData["createdTime"] = singleData.createdTime;
                     newData["customerId"] = singleData.customerId;
                     newData["requestId"] = singleData.requestId;
-                    if(singleData.completedTime)
-                        newData['completedTime'] = singleData.elapsedCompletedTime(false);
-                    if(singleData.ongoingTime)
-                        newData['pickedUpTime'] = singleData.elapsedOngoingTime(false);
-                    newData['requestTime'] = singleData.elapsedCreatedTime(false);
+                    let tmp = singleData.elapsedCreatedTime(false);
+                    newData['requestTime'] = tmp == "" ? "0 minutes " : tmp;
+                    if(singleData.completedTime){
+                        tmp = singleData.elapsedCompletedTime(false)
+                        newData['completedTime'] = tmp == "" ? "0 minutes " : tmp;
+                    }
+                    if(singleData.ongoingTime){
+                        tmp = singleData.elapsedOngoingTime(false);
+                        newData['pickedUpTime'] = tmp == "" ? "0 minutes " : tmp;
+                    }
                     return newData;
                 });
                 returnData['completed'] = completedRequests;
