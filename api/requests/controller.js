@@ -27,7 +27,10 @@ exports.createRequest = (req,res) => {
 };
 
 exports.updateRequest = (req,res) => {
-    let variables = {};
+    let variables = {
+        requestId : req.params.requestId,
+        driverId : req.body.driverId
+    };
     handler.updateRequest(variables)
         .then( body => {
             responseHandler.returnResponse(res,body);

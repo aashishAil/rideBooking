@@ -5,11 +5,11 @@
     <title>Customer portal</title>
     <style>
         .input-data {
-            margin-left: 30%;
+            margin-left:45%;
             margin-top: 10%
         }
         .button-div {
-            margin-left: 42%;
+            margin-left: 50%;
             margin-top: 4%;
         }
         .ride-now {
@@ -34,13 +34,16 @@
             var sendData = {
                 "customerId" : document.getElementById('customerId').value
             };
-            var url = 'http://192.168.0.107:5432/api/requests/';
+            var url = 'http://192.168.0.4:5432/api/requests/';
             var mimeType = "application/json";
 
             xmlHttp.onreadystatechange = function(){
                 if(this.readyState == 4){
                     if (this.status == 201){
                         document.getElementById('notification').innerHTML = 'Created successfully';
+                    }
+                    else if( this.status == 202){
+                        document.getElementById('notification').innerHTML = this.responseText;
                     }
                     else if(this.status == 400){
                         document.getElementById('notification').innerHTML = 'Customer Id should be numeric';
