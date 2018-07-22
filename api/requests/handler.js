@@ -34,12 +34,13 @@ exports.getAllRequests = () => {
 
 exports.getDriverRequests = () => {
     return new Promise( (resolve,reject) => {
-        
+
     });
 };
 
 exports.createRequest = (variables) => {
     return new Promise( (resolve,reject) => {
+        let request;
         checker.validate(variables)
             .then(checked => {
                 if(checked.errors){
@@ -48,11 +49,15 @@ exports.createRequest = (variables) => {
                         message : checked.message
                     }
                 }
-                let request = new requests(variables);
+                request = new requests(variables);
                 request.requestId = request.generateUuid();
                 return request.save();
             })
             .then(() => {
+                /*setInterval( request =>{
+                    request.status = 'complete'
+                    request.save();
+                },300000);*/
                 return{
                     statusCode : httpCodes.CREATED,
                     body : {},
@@ -90,3 +95,8 @@ exports.updateRequest = () => {
 
     });
 };
+
+function changeStatus(request){
+    request.status = 'complete'
+    request.save();
+}

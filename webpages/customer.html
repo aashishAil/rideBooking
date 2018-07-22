@@ -18,29 +18,42 @@
             font-weight: bold;
         }
     </style>
-    <script>
-        function rideNow() {
-            var xmlHttp = getNewHTTPObject();
-            var sendData = document.getElementById('id').value;
-            chargeURLPut('localhost:5432/api/requests');
-
-            function chargeURLPut(url) {
-                var mimeType = "application/json";
-                xmlHttp.open('PUT', url, true);  // true : asynchrone false: synchrone
-                xmlHttp.setRequestHeader('Content-Type', mimeType);
-                xmlHttp.send(sendData);
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="input-data">
         <span style="font-weight:bold">Customer ID:&nbsp;</span>
-        <input type="text" onkeypress="return (event.charCode > 48 && event.charCode < 57)">
+        <input  id = 'customerId' type="text" onkeypress="return (event.charCode > 48 && event.charCode < 57)">
         <span id="notification"></span>
     </div>
     <div class="button-div">
         <button class="ride-now" onclick="rideNow()">Ride Now</button>
     </div>
+    <script>
+        function rideNow() {
+            var xmlHttp = new XMLHttpRequest();
+            var sendData = {
+                "customerId" : document.getElementById('customerId').value
+            };
+            var url = 'http://192.168.0.107:5432/api/requests/';
+            var mimeType = "application/json";
+
+            xmlHttp.onreadystatechange = function(){
+                if(this.readyState == 4){
+                    if (this.status == 201){
+                        document.getElementById('notification').innerHTML = 'Created successfully';
+                    }
+                    else if(this.status == 400){
+                        document.getElementById('notification').innerHTML = 'Customer Id should be numeric';
+                    }else if(this.status == 500){
+                        document.getElementById('notification').innerHTML = 'Some error occured';
+                    }
+                }
+            }
+
+            xmlHttp.open('PUT', url, true);
+            xmlHttp.setRequestHeader('Content-Type', mimeType);
+            xmlHttp.send(JSON.stringify(sendData));
+        }
+    </script>
 </body>
 </html>
