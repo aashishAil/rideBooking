@@ -28,7 +28,10 @@
     <div class="button-div">
         <button class="ride-now" onclick="rideNow()">Ride Now</button>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
+        var socket = io();
+
         function rideNow() {
             var xmlHttp = new XMLHttpRequest();
             var sendData = {
@@ -40,6 +43,7 @@
             xmlHttp.onreadystatechange = function(){
                 if(this.readyState == 4){
                     if (this.status == 201){
+                        socket.emit('New Request');
                         document.getElementById('notification').innerHTML = 'Created successfully';
                     }
                     else if( this.status == 202){

@@ -53,6 +53,10 @@ io.on('connection' , socket => {
        console.log('Request accepted by driver');
        io.emit('Accept Request', { for: 'everyone' });
    });
+   socket.on('New Request', () => {
+        console.log('New request created by customer');
+        io.emit('New Request', { for: 'everyone' });
+   });
    socket.on('disconnect', () => {
       console.log('User disconnected');
    });
