@@ -9,7 +9,9 @@ exports.getAllRequests = (req,res) => {
 };
 
 exports.getDriverRequests = (req,res) => {
-    let variables = {};
+    let variables = {
+        driverId : req.params.driverId
+    };
     handler.getDriverRequests(variables)
         .then( body => {
             responseHandler.returnResponse(res,body);

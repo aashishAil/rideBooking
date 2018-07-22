@@ -7,6 +7,7 @@ const errorMessage = 'Some error occured';
 const validationError = 'ValidationError';
 const alreadyExists = 'Request Already exists';
 const alreadyExistsMessage = 'Request for this customer already is already in progress';
+const driverExistsMessage = 'Already one request in progress for this driver';
 const notFound = 'Not found';
 const notFoundMessage = 'Request is not available';
 
@@ -15,8 +16,18 @@ exports.getAllRequests = () => {
         requests.find({}, { '_id' : 0 ,'__v' : 0})
             .then( data => {
                 data = data.map( (singleData) => {
-                   singleData['elapsedTime'] = singleData.elapsedTime();
-                   return singleData;
+                    let newData = {};
+                    newData["status"] = singleData.status;
+                    newData["createdTime"] = singleData.createdTime;
+                    newData["customerId"] = singleData.customerId;
+                    newData["requestId"] = singleData.requestId;
+                    if(singleData.completedTime)
+                        newData['elapsedTime'] = singleData.elapsedCompletedTime(true);
+                    else if(singleData.ongoingTime)
+                        newData['elapsedTime'] = singleData.elapsedOngoingTime(true);
+                    else
+                        newData['elapsedTime'] = singleData.elapsedCreatedTime(true);
+                   return newData;
                 });
                 return{
                     statusCode : httpCodes.OK,
@@ -36,15 +47,90 @@ exports.getAllRequests = () => {
   });
 };
 
-exports.getDriverRequests = () => {
+exports.getDriverRequests = (variables) => {
     return new Promise( (resolve,reject) => {
-
+        let returnData = {};
+        checker.validate(variables)
+            .then(checked => {
+                if(checked.errors){
+                    throw {
+                        name : validationError,
+                        message : checked.message
+                    }
+                }
+                return requests.find({status : 'waiting'}, { '_id' : 0 ,'__v' : 0});
+            })
+            .then( waitingRequests => {
+                waitingRequests = waitingRequests.map( (singleData) => {
+                    let newData = {};
+                    newData["status"] = singleData.status;
+                    newData["createdTime"] = singleData.createdTime;
+                    newData["customerId"] = singleData.customerId;
+                    newData["requestId"] = singleData.requestId;
+                    if(singleData.completedTime)
+                        newData['completedTime'] = singleData.elapsedCompletedTime(false);
+                    if(singleData.ongoingTime)
+                        newData['pickedUpTime'] = singleData.elapsedOngoingTime(false);
+                    newData['requestTime'] = singleData.elapsedCreatedTime(false);
+                    return newData;
+                });
+                returnData['waiting'] = waitingRequests;
+                return requests.find({status : 'ongoing' , driverId : variables.driverId}
+                                      , { '_id' : 0 ,'__v' : 0});
+            })
+            .then( ongoingRequests => {
+                ongoingRequests = ongoingRequests.map( (singleData) => {
+                    let newData = {};
+                    newData["status"] = singleData.status;
+                    newData["createdTime"] = singleData.createdTime;
+                    newData["customerId"] = singleData.customerId;
+                    newData["requestId"] = singleData.requestId;
+                    if(singleData.completedTime)
+                        newData['completedTime'] = singleData.elapsedCompletedTime(false);
+                    if(singleData.ongoingTime)
+                        newData['pickedUpTime'] = singleData.elapsedOngoingTime(false);
+                    newData['requestTime'] = singleData.elapsedCreatedTime(false);
+                    return newData;
+                });
+                returnData['ongoing'] = ongoingRequests;
+                return requests.find({status : 'complete' , driverId : variables.driverId }
+                                        , { '_id' : 0 ,'__v' : 0});
+            })
+            .then( completedRequests => {
+                completedRequests = completedRequests.map( (singleData) => {
+                    let newData = {};
+                    newData["status"] = singleData.status;
+                    newData["createdTime"] = singleData.createdTime;
+                    newData["customerId"] = singleData.customerId;
+                    newData["requestId"] = singleData.requestId;
+                    if(singleData.completedTime)
+                        newData['completedTime'] = singleData.elapsedCompletedTime(false);
+                    if(singleData.ongoingTime)
+                        newData['pickedUpTime'] = singleData.elapsedOngoingTime(false);
+                    newData['requestTime'] = singleData.elapsedCreatedTime(false);
+                    return newData;
+                });
+                returnData['completed'] = completedRequests;
+                return {
+                    statusCode : httpCodes.OK,
+                    body : returnData,
+                    log : 'Returned complete data for driver'
+                }
+            })
+            .catch( err => {
+                return {
+                    statusCode : httpCodes.INTERNAL_SERVER_ERROR,
+                    body : errorMessage,
+                    log : err
+                }
+            }).then( sendBack => {
+                resolve(sendBack);
+            });
     });
 };
 
 exports.createRequest = (variables) => {
     return new Promise( (resolve,reject) => {
-        let request;
         checker.validate(variables)
             .then(checked => {
                 if(checked.errors){
@@ -61,12 +147,11 @@ exports.createRequest = (variables) => {
                         name : alreadyExists
                     }
                 }
-                request = new requests(variables);
+                let request = new requests(variables);
                 request.requestId = request.generateUuid();
                 return request.save();
             })
             .then(() => {
-                setTimeout(changeStatus,300000,request);
                 return{
                     statusCode : httpCodes.CREATED,
                     body : {},
@@ -106,12 +191,21 @@ exports.createRequest = (variables) => {
 
 exports.updateRequest = (variables) => {
     return new Promise( (resolve,reject) => {
+        let finalRequest;
         checker.validate(variables)
             .then(checked => {
                 if(checked.errors){
                     throw {
                         name : validationError,
                         message : checked.message
+                    }
+                }
+                return requests.findOne({ driverId : variables.driverId , status : 'ongoing'});
+            })
+            .then( request => {
+                if(request){
+                    throw {
+                        name : alreadyExists
                     }
                 }
                 return requests.findOne({ requestId : variables.requestId , status : 'waiting'});
@@ -124,9 +218,12 @@ exports.updateRequest = (variables) => {
                 }
                 request.status = 'ongoing';
                 request['driverId'] = variables.driverId;
+                request['ongoingTime'] = new Date();
+                finalRequest = request;
                 return request.save();
             })
             .then( () => {
+                setTimeout(changeStatus,300000,finalRequest);
                 return{
                     statusCode : httpCodes.OK,
                     body : {},
@@ -147,6 +244,11 @@ exports.updateRequest = (variables) => {
                     body = notFoundMessage;
                     log = notFound;
                 }
+                else if(err.name === alreadyExists){
+                    statusCode = httpCodes.ACCEPTED;
+                    body = driverExistsMessage;
+                    log = alreadyExists;
+                }
                 else{
                     statusCode = httpCodes.INTERNAL_SERVER_ERROR;
                     body = errorMessage;
@@ -165,7 +267,8 @@ exports.updateRequest = (variables) => {
 };
 
 function changeStatus(request){
-    request.status = 'complete'
+    request.status = 'complete';
+    request['completedTime'] = new Date();
     request.save()
         .then( () => {
             console.log('Request status marked as completed');
