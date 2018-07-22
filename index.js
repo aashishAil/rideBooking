@@ -23,6 +23,12 @@ dbConnection.once('open', () => {
 app.use(cors());
 app.use(bodyParser.json());
 
+app.use('/api/requests',require('./api/requests'));
+
+app.get('/customerApp.html',(req,res) =>{
+    res.sendFile( __dirname +'/webpages/customer.html');
+});
+
 
 http = require('http').Server(app);
 io = require('socket.io')(http);

@@ -17,7 +17,9 @@ exports.getDriverRequests = (req,res) => {
 };
 
 exports.createRequest = (req,res) => {
-    let variables = {};
+    let variables = {
+        customerId : req.body.customerId
+    };
     handler.createRequest(variables)
         .then( body => {
             responseHandler.returnResponse(res,body);

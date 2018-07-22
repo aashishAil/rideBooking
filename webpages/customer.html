@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer portal</title>
+    <style>
+        .input-data {
+            margin-left: 30%;
+            margin-top: 10%
+        }
+        .button-div {
+            margin-left: 42%;
+            margin-top: 4%;
+        }
+        .ride-now {
+            padding:2px 25px 2px 25px;
+            background-color: #969899;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function rideNow() {
+            var xmlHttp = getNewHTTPObject();
+            var sendData = document.getElementById('id').value;
+            chargeURLPut('localhost:5432/api/requests');
+
+            function chargeURLPut(url) {
+                var mimeType = "application/json";
+                xmlHttp.open('PUT', url, true);  // true : asynchrone false: synchrone
+                xmlHttp.setRequestHeader('Content-Type', mimeType);
+                xmlHttp.send(sendData);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="input-data">
+        <span style="font-weight:bold">Customer ID:&nbsp;</span>
+        <input type="text" onkeypress="return (event.charCode > 48 && event.charCode < 57)">
+        <span id="notification"></span>
+    </div>
+    <div class="button-div">
+        <button class="ride-now" onclick="rideNow()">Ride Now</button>
+    </div>
+</body>
+</html>
