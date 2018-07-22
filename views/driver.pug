@@ -6,6 +6,10 @@ html(lang='en')
         h1 Driver App - driver id
             span(id='driverId') #{id}
         button(onclick= "getData();") Refresh
-        table(id = table)
+        br
+        br
+        table(id='waiting' style="float:left;")
+        table(id='ongoing' style="float:left;")
+        table(id='completed' style="float:left;")
         script
             include ./script.js

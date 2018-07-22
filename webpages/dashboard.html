@@ -34,7 +34,7 @@
             var table = document.createElement('TABLE');
             var tableBody = document.createElement('TBODY');
 
-            table.border = '1'
+            table.border = '1';
             table.appendChild(tableBody);
 
             var tableHeaders = ["Request Id","Customer Id", "Elapsed Time","Status","Driver"];
@@ -43,7 +43,7 @@
             tableBody.appendChild(tr);
 
             for (var i = 0; i < tableHeaders.length; i++) {
-                var th = document.createElement('TH')
+                var th = document.createElement('TH');
                 th.width = '75';
                 th.appendChild(document.createTextNode(tableHeaders[i]));
                 tr.appendChild(th);
