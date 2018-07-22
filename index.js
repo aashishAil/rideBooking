@@ -22,6 +22,7 @@ dbConnection.once('open', () => {
     console.log('Connected to mongo');
 })
 
+app.set('view engine', 'pug');
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -32,6 +33,9 @@ app.get('/customerapp.html',(req,res) =>{
 });
 app.get('/dashboard.html',(req,res) =>{
     res.sendFile( __dirname +'/webpages/dashboard.html');
+});
+app.get('/driverapp.html/:id',(req,res) =>{
+    res.render('driver',{ id : req.params.id });
 });
 
 app.all('*', (req,res) => {

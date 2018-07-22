@@ -1,0 +1,11 @@
+doctype html
+html(lang='en')
+    head
+        title Driver #{id} details
+    body
+        h1 Driver App - driver id
+            span(id='driverId') #{id}
+        button(onclick= "getData();") Refresh
+        table(id = table)
+        script
+            include ./script.js
