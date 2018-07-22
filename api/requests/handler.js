@@ -18,7 +18,7 @@ exports.getAllRequests = () => {
                 data = data.map( (singleData) => {
                     let newData = {};
                     newData["status"] = singleData.status;
-                    newData["createdTime"] = singleData.createdTime;
+                    newData["driverId"] = singleData.driverId;
                     newData["customerId"] = singleData.customerId;
                     newData["requestId"] = singleData.requestId;
                     if(singleData.completedTime)

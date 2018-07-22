@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <script>
+        window.onload = function(){
+            getData();
+        }
+        function getData() {
+            var xmlHttp = new XMLHttpRequest();
+            var url = 'http://192.168.0.4:5432/api/requests/';
+            var mimeType = "application/json";
+
+            xmlHttp.onreadystatechange = function(){
+                if(this.readyState == 4){
+                    if (this.status == 200){
+                        addTable(JSON.parse(this.response));
+                    }
+                }
+            }
+
+            xmlHttp.open('GET', url, true);
+            xmlHttp.setRequestHeader('Content-Type', mimeType);
+            xmlHttp.send(null);
+        }
+
+        function addTable(data){
+            var div = document.getElementById("results");
+            var table = document.createElement('TABLE');
+            var tableBody = document.createElement('TBODY');
+
+            table.border = '1'
+            table.appendChild(tableBody);
+
+            var tableHeaders = ["Request Id","Customer Id", "Elapsed Time","Status","Driver"];
+
+            var tr = document.createElement('TR');
+            tableBody.appendChild(tr);
+
+            for (var i = 0; i < tableHeaders.length; i++) {
+                var th = document.createElement('TH')
+                th.width = '75';
+                th.appendChild(document.createTextNode(tableHeaders[i]));
+                tr.appendChild(th);
+            }
+
+            for (i = 0; i < data.length; i++) {
+                var tr = document.createElement('TR');
+                var td = document.createElement('TD');
+                td.appendChild(document.createTextNode(data[i]['requestId']));
+                tr.appendChild(td);
+                td = document.createElement('TD');
+                td.appendChild(document.createTextNode(data[i]['customerId']));
+                tr.appendChild(td);
+                td = document.createElement('TD');
+                td.appendChild(document.createTextNode(data[i]['elapsedTime']));
+                tr.appendChild(td);
+                td = document.createElement('TD');
+                td.appendChild(document.createTextNode(data[i]['status']));
+                tr.appendChild(td);
+                td = document.createElement('TD');
+                td.appendChild(document.createTextNode(data[i]['driverId']));
+                tr.appendChild(td);
+                tableBody.appendChild(tr);
+            }
+            
+            div.appendChild(table);
+        }
+    </script>
+</body>
+    <div id="results">
+    </div>
+</html>
